@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Destinations — Stackly Expeditions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* SEARCH + FILTER */
+.search-filter-bar{display:flex;gap:1rem;margin-bottom:3rem;flex-wrap:wrap;align-items:center;}
+.dest-search-input{flex:1;min-width:200px;background:var(--glass);border:1.5px solid var(--glass-border);color:var(--white);padding:.7rem 1.2rem;border-radius:6px;font-size:.9rem;outline:none;transition:border-color .3s;}
+.dest-search-input:focus{border-color:var(--orange);}
+.dest-search-input::placeholder{color:var(--gray-light);}
+.region-select{background:var(--glass);border:1.5px solid var(--glass-border);color:var(--white);padding:.7rem 1.2rem;border-radius:6px;font-size:.85rem;outline:none;min-width:160px;}
+.region-select option{background:var(--navy-mid);}
+
+
+.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap;}
+
+@media(max-width:600px){
+  .filter-chips{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.7rem;
+    width:100%;
+  }
+  .chip{
+    width:100%;
+    text-align:center;
+    padding:.55rem .5rem;
+  }
+  .filter-chips .chip:first-child{
+    grid-column:1 / -1;
+  }
+}
+.chip{background:var(--glass);border:1px solid var(--glass-border);color:var(--gray-light);padding:.38rem 1rem;border-radius:40px;font-size:.73rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;transition:all .25s;}
+.chip:hover,.chip.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+.footer-social{
+  display:flex; gap:12px;
+}
+.social-btn{
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:1px solid var(--line-2);
+  color:var(--txt-soft); transition:.3s var(--ease);
+}
+.social-btn svg{
+  width:17px; height:17px;
+}
+.social-btn:hover{
+  border-color:var(--gold); color:var(--gold-2);
+  background:#f97316;;
+}
+
+/* DESTINATION CARDS */
+.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.dest-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;transition:transform .35s,box-shadow .35s,border-color .3s;cursor:pointer;}
+.dest-card:hover{transform:translateY(-10px);box-shadow:0 30px 60px rgba(0,0,0,.4);border-color:rgba(249,115,22,.3);}
+.dest-img{height:240px;overflow:hidden;position:relative;}
+.dest-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s;display:block;}
+.dest-card:hover .dest-img img{transform:scale(1.08);}
+.dest-region{position:absolute;top:1rem;left:1rem;background:rgba(10,15,30,.8);backdrop-filter:blur(8px);border:1px solid var(--glass-border);color:var(--white);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:.22rem .65rem;border-radius:3px;}
+.dest-fav{position:absolute;top:1rem;right:1rem;width:34px;height:34px;border-radius:50%;background:rgba(10,15,30,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .25s,transform .2s;}
+.dest-fav:hover{background:rgba(249,115,22,.8);transform:scale(1.15);}
+.dest-body{padding:1.4rem;}
+.dest-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;margin-bottom:.2rem;}
+.dest-country{font-size:.73rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:.8rem;}
+.dest-desc{font-size:.82rem;color:var(--gray-light);line-height:1.68;margin-bottom:1rem;}
+.dest-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;}
+.dest-tag{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:var(--orange);font-size:.62rem;font-weight:600;padding:.18rem .55rem;border-radius:3px;}
+.dest-footer{display:flex;justify-content:space-between;align-items:center;padding-top:.9rem;border-top:1px solid var(--glass-border);}
+.dest-info-row{display:flex;gap:1rem;font-size:.75rem;color:var(--gray-light);}
+.dest-btn{background:var(--orange);color:#fff;padding:.42rem 1rem;border-radius:3px;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:background .25s,transform .2s;}
+.dest-btn:hover{background:var(--orange-deep);transform:scale(1.04);}
+
+/* FEATURED HERO DEST */
+.featured-dest{position:relative;border-radius:10px;overflow:hidden;height:420px;cursor:pointer;display:flex;align-items:flex-end;margin-bottom:3rem;}
+.featured-dest img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .65s;}
+.featured-dest:hover img{transform:scale(1.05);}
+.featured-dest-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,30,.94) 0%,rgba(10,15,30,.3) 60%,rgba(10,15,30,.1) 100%);}
+.featured-dest-content{position:relative;z-index:2;padding:2.5rem;width:100%;}
+.fd-badge{display:inline-block;background:var(--orange);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.22rem .65rem;border-radius:2px;margin-bottom:.8rem;}
+.fd-name{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:.04em;line-height:1;margin-bottom:.5rem;}
+.fd-meta{display:flex;gap:1.5rem;font-size:.8rem;color:rgba(249,250,251,.7);flex-wrap:wrap;margin-bottom:1.2rem;}
+.fd-actions{display:flex;gap:1rem;}
+
+/* MAP SECTION */
+.map-wrap{display:grid;grid-template-columns:1fr 1.8fr;gap:3rem;align-items:center;}
+.map-list{display:flex;flex-direction:column;gap:.8rem;}
+.ml-item{display:flex;align-items:center;gap:1rem;padding:.9rem 1.1rem;background:var(--glass);border:1px solid var(--glass-border);border-radius:6px;cursor:pointer;transition:border-color .3s,background .3s,transform .25s;}
+.ml-item:hover,.ml-item.active{border-color:var(--orange);background:rgba(249,115,22,.08);transform:translateX(6px);}
+.ml-num{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--orange);min-width:2rem;}
+.ml-info h4{font-size:.88rem;font-weight:600;}
+.ml-info p{font-size:.73rem;color:var(--gray-light);margin-top:.1rem;}
+.map-visual{position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(249,115,22,.2);min-height:400px;}
+.map-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7;display:block;}
+.map-pin{position:absolute;width:14px;height:14px;background:var(--orange);border-radius:50%;border:2px solid #fff;animation:pinPulse 2s infinite;cursor:pointer;}
+.map-pin::after{content:attr(data-label);position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid var(--glass-border);font-size:.62rem;font-weight:700;padding:.18rem .5rem;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;}
+.map-pin:hover::after{opacity:1;}
+@keyframes pinPulse{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.6)}50%{box-shadow:0 0 0 10px rgba(249,115,22,0)}}
+
+/* CLIMATE TABLE */
+.climate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem;}
+.cl-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:8px;padding:1.3rem;text-align:center;transition:transform .3s,border-color .3s;}
+.cl-card:hover{transform:translateY(-5px);border-color:rgba(249,115,22,.35);}
+.cl-region{font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:.4rem;}
+.cl-dest{font-weight:700;font-size:.9rem;margin-bottom:.6rem;}
+.cl-months{font-size:.78rem;color:var(--emerald-light);margin-bottom:.35rem;}
+.cl-note{font-size:.74rem;color:var(--gray-light);}
+
+@media(max-width:1100px){.dest-grid{grid-template-columns:1fr 1fr;} .climate-grid{grid-template-columns:1fr 1fr;} .map-wrap{grid-template-columns:1fr;}}
+@media(max-width:768px){.dest-grid{grid-template-columns:1fr;} .search-filter-bar{flex-direction:column;} .dest-search-input,.region-select{width:100%;} .featured-dest{height:300px;} .fd-name{font-size:2.5rem;} .fd-actions{flex-wrap:wrap;} .climate-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:540px){.featured-dest{height:250px;} .climate-grid{grid-template-columns:1fr;} .fd-meta{gap:.8rem;}}
+</style>
+</head>
+<body>
+<!-- <div id="loader"><div class="loader-logo">Stackly</div><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-text">Mapping your world…</div></div> -->
+
+<nav id="navbar">
+    <a href="index.html" class="nav-logo">
+  <img src="./assets/stackly adventure tourism logo.webp" alt="Stackly logo" class="nav-logo-img">
+  STACKLY
+</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="services.html">Services</a></li><li><a href="destinations.html" class="active">Destinations</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right"><button class="nav-login-btn" onclick="window.location.href='login.html'">Login</button><button class="nav-cta" onclick="window.location.href='404.html'">Book Now</button></div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMenu()">Home</a><a href="about.html" onclick="closeMenu()">About</a><a href="services.html" onclick="closeMenu()">Services</a><a href="destinations.html" onclick="closeMenu()">Destinations</a><a href="blog.html" onclick="closeMenu()">Blog</a><a href="contact.html" onclick="closeMenu()">Contact</a>
+  <div class="mob-btns"><button class="nav-login-btn" onclick="window.location.href='login.html'">Login</button><button class="nav-cta" onclick="window.location.href='404.html'">Book Now</button></div>
+</div>
+
+<div class="page-hero">
+  <div class="float-deco-wrap-r" data-aos="fade-left" data-aos-delay="300">
+    <div class="float-deco float-deco-r1"><img src="./assets/desti 1.webp" alt="Summit climb"></div>
+    <div class="float-deco float-deco-r2"><img src="./assets/desti 2.webp" alt="River adventure"></div>
+    <div class="float-deco float-deco-r3"><img src="./assets/desti 3.webp" alt="Camp expedition"></div>
+  </div>
+  <div class="page-hero-bg" style="background-image:url('./assets/destination\ bg.webp')"></div>
+  <div class="page-hero-overlay"></div><div class="page-hero-grid"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Destinations</span></div>
+    <div class="page-eyebrow">87 Destinations Worldwide</div>
+    <h1 class="page-h1">Explore <em>Earth's</em><br>Wildest Places</h1>
+    <p class="page-sub">From sub-zero Himalayan passes to scorched Patagonian winds — every corner of our planet holds a defining adventure. We've charted them all.</p>
+  </div>
+</div>
+
+<section class="section-pad" style="background:var(--navy);">
+  <!-- FEATURED DESTINATION -->
+  <div class="featured-dest" data-aos="fade-up">
+    <img src="assets/destination himalayas.webp" alt="Himalayas">
+    <div class="featured-dest-overlay"></div>
+    <div class="featured-dest-content">
+      <div class="fd-badge">⭐ Destination of the Year 2025</div>
+      <div class="fd-name">Himalayas, Nepal</div>
+      <div class="fd-meta"><span>⛰ Up to 8,849m</span><span>🗓 Best: Oct–May</span><span>★ 4.97 / 5.0</span><span>📍 Nepal & Tibet</span><span>👥 12 tours available</span></div>
+      <div class="fd-actions">
+        <a href="./404.html" class="btn-primary">View Tours →</a>
+        <a href="./404.html" class="btn-ghost">Plan a Custom Expedition</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH & FILTER -->
+  <div class="search-filter-bar" data-aos="fade-up">
+    <input type="text" class="dest-search-input" id="destSearch" placeholder="🔍  Search destinations…" oninput="filterDests()">
+    <select class="region-select" id="regionSel" onchange="filterDests()">
+      <option value="all">All Regions</option>
+      <option value="asia">Asia</option>
+      <option value="africa">Africa</option>
+      <option value="southamerica">South America</option>
+      <option value="europe">Europe</option>
+      <option value="oceania">Oceania</option>
+    </select>
+    <div class="filter-chips">
+      <button class="chip on" onclick="chipFilter('all',this)">All</button>
+      <button class="chip" onclick="chipFilter('trekking',this)">Trekking</button>
+      <button class="chip" onclick="chipFilter('mountaineering',this)">Mountaineering</button>
+      <button class="chip" onclick="chipFilter('safari',this)">Safari</button>
+      <button class="chip" onclick="chipFilter('water',this)">Water</button>
+    </div>
+  </div>
+
+  <!-- DESTINATIONS GRID -->
+  <div class="dest-grid" id="destGrid">
+    <div class="dest-card" data-region="asia" data-type="trekking mountaineering" data-name="himalayas nepal" data-aos="fade-up" data-aos-delay="50">
+      <div class="dest-img"><img src="./assets/himalaiyas.webp" alt="Himalayas"><div class="dest-region">Asia</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Himalayas</div><div class="dest-country">Nepal & Tibet</div><div class="dest-desc">The crown of the Earth. Home to eight of the world's fourteen 8,000m peaks, ancient monasteries, and the legendary Sherpa culture.</div><div class="dest-tags"><span class="dest-tag">Trekking</span><span class="dest-tag">Mountaineering</span><span class="dest-tag">Cultural</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.97</span><span>12 tours</span><span>Oct–May</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="southamerica" data-type="trekking" data-name="patagonia chile" data-aos="fade-up" data-aos-delay="120">
+      <div class="dest-img"><img src="./assets/patagona 1.webp" alt="Patagonia"><div class="dest-region">S. America</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Patagonia</div><div class="dest-country">Chile & Argentina</div><div class="dest-desc">Jagged granite towers rising from turquoise lakes, howling Patagonian winds, and 3,000km of the world's most dramatic wilderness.</div><div class="dest-tags"><span class="dest-tag">Trekking</span><span class="dest-tag">Photography</span><span class="dest-tag">Wild Camping</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.92</span><span>5 tours</span><span>Nov–Mar</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="africa" data-type="mountaineering safari" data-name="kilimanjaro tanzania" data-aos="fade-up" data-aos-delay="190">
+      <div class="dest-img"><img src="./assets/africa kilimanjaro.webp" alt="Kilimanjaro"><div class="dest-region">Africa</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Kilimanjaro</div><div class="dest-country">Tanzania</div><div class="dest-desc">Africa's highest peak at 5,895m. Traverse five distinct ecological zones from equatorial rainforest to arctic summit plateau.</div><div class="dest-tags"><span class="dest-tag">Mountaineering</span><span class="dest-tag">Wildlife</span><span class="dest-tag">Iconic</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.88</span><span>4 tours</span><span>Jan–Mar</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="africa" data-type="safari" data-name="serengeti tanzania" data-aos="fade-up" data-aos-delay="50">
+      <div class="dest-img"><img src="./assets/Serengeti.webp" alt="Serengeti"><div class="dest-region">Africa</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Serengeti</div><div class="dest-country">Tanzania</div><div class="dest-desc">Witness 1.5 million wildebeest in the world's greatest wildlife spectacle. Big Five encounters daily across the golden savanna.</div><div class="dest-tags"><span class="dest-tag">Safari</span><span class="dest-tag">Wildlife</span><span class="dest-tag">Photography</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.95</span><span>3 tours</span><span>Jul–Oct</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="europe" data-type="trekking" data-name="iceland" data-aos="fade-up" data-aos-delay="120">
+      <div class="dest-img"><img src="assets/destination glacier.webp" alt="Iceland"><div class="dest-region">Europe</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Iceland</div><div class="dest-country">Iceland</div><div class="dest-desc">Glaciers, volcanoes, lava fields, geysers, and the aurora borealis — all on an island straddling two tectonic plates.</div><div class="dest-tags"><span class="dest-tag">Trekking</span><span class="dest-tag">Aurora</span><span class="dest-tag">Glaciers</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.93</span><span>4 tours</span><span>Oct–Mar</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="asia" data-type="trekking" data-name="borneo malaysia" data-aos="fade-up" data-aos-delay="190">
+      <div class="dest-img"><img src="./assets/borneo desti.webp" alt="Borneo"><div class="dest-region">Asia</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Borneo</div><div class="dest-country">Malaysia & Indonesia</div><div class="dest-desc">Ancient rainforest older than the Amazon. Proboscis monkeys, pygmy elephants, and the world's most biodiverse jungle canopy.</div><div class="dest-tags"><span class="dest-tag">Jungle Trek</span><span class="dest-tag">Wildlife</span><span class="dest-tag">Caving</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.85</span><span>3 tours</span><span>Mar–Oct</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="southamerica" data-type="water" data-name="amazon brazil" data-aos="fade-up" data-aos-delay="50">
+      <div class="dest-img"><img src="./assets/amazon.webp" alt="Amazon"><div class="dest-region">S. America</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Amazon Basin</div><div class="dest-country">Brazil & Peru</div><div class="dest-desc">The world's greatest river system. Kayak through flooded forests, camp under the Milky Way, and encounter river dolphins.</div><div class="dest-tags"><span class="dest-tag">Water Sports</span><span class="dest-tag">Kayaking</span><span class="dest-tag">Wildlife</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.90</span><span>2 tours</span><span>May–Sep</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="oceania" data-type="trekking" data-name="new zealand" data-aos="fade-up" data-aos-delay="120">
+      <div class="dest-img"><img src="./assets/nz.webp" alt="NZ"><div class="dest-region">Oceania</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Southern Alps</div><div class="dest-country">New Zealand</div><div class="dest-desc">The Milford Track, Routeburn, and Tongariro — NZ's Great Walks through some of the planet's most spectacular scenery.</div><div class="dest-tags"><span class="dest-tag">Trekking</span><span class="dest-tag">Great Walks</span><span class="dest-tag">Fiords</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.91</span><span>3 tours</span><span>Nov–Apr</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+    <div class="dest-card" data-region="asia" data-type="mountaineering" data-name="karakoram pakistan" data-aos="fade-up" data-aos-delay="190">
+      <div class="dest-img"><img src="./assets/pak.webp" alt="Karakoram"><div class="dest-region">Asia</div><div class="dest-fav">🤍</div></div>
+      <div class="dest-body"><div class="dest-name">Karakoram</div><div class="dest-country">Pakistan</div><div class="dest-desc">Home to K2, the Savage Mountain. The greatest concentration of high peaks on Earth — the last true frontier in expedition mountaineering.</div><div class="dest-tags"><span class="dest-tag">Mountaineering</span><span class="dest-tag">Extreme</span><span class="dest-tag">Remote</span></div><div class="dest-footer"><div class="dest-info-row"><span>★ 4.98</span><span>2 tours</span><span>Jun–Aug</span></div><a href="./404.html" class="dest-btn">Explore</a></div></div>
+    </div>
+  </div>
+  <p id="noResults" style="display:none;text-align:center;color:var(--gray-light);padding:3rem 0;font-size:1rem;">No destinations found. Try a different search.</p>
+</section>
+
+<!-- MAP -->
+<section class="section-pad" style="background:var(--navy-mid);">
+  <div class="section-eyebrow">Interactive</div>
+  <h2 class="section-h2" data-aos="fade-up">Where We <span style="color:var(--orange)">Operate</span></h2>
+  <div class="map-wrap" style="margin-top:3rem;">
+    <div class="map-list" data-aos="fade-right">
+      <div class="ml-item active"><span class="ml-num">01</span><div class="ml-info"><h4>Himalayas, Nepal</h4><p>High-altitude trekking & mountaineering</p></div></div>
+      <div class="ml-item"><span class="ml-num">02</span><div class="ml-info"><h4>Patagonia, Chile</h4><p>Southern ice fields & granite spires</p></div></div>
+      <div class="ml-item"><span class="ml-num">03</span><div class="ml-info"><h4>Serengeti, Tanzania</h4><p>Great migration & wildlife encounters</p></div></div>
+      <div class="ml-item"><span class="ml-num">04</span><div class="ml-info"><h4>Amazon, Brazil</h4><p>Jungle expeditions & river kayaking</p></div></div>
+      <div class="ml-item"><span class="ml-num">05</span><div class="ml-info"><h4>Iceland</h4><p>Glaciers, volcanoes & aurora viewing</p></div></div>
+      <div class="ml-item"><span class="ml-num">06</span><div class="ml-info"><h4>Karakoram, Pakistan</h4><p>K2 & high-altitude mountaineering</p></div></div>
+    </div>
+    <div class="map-visual" data-aos="fade-left">
+      <img src="./assets/world.webp" alt="World Map">
+      <div class="map-pin" style="top:28%;left:62%" data-label="Nepal"></div>
+      <div class="map-pin" style="top:72%;left:27%" data-label="Patagonia"></div>
+      <div class="map-pin" style="top:48%;left:54%" data-label="Serengeti"></div>
+      <div class="map-pin" style="top:47%;left:33%" data-label="Amazon"></div>
+      <div class="map-pin" style="top:16%;left:45%" data-label="Iceland"></div>
+      <div class="map-pin" style="top:30%;left:64%" data-label="K2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BEST TIME TO VISIT -->
+<section class="section-pad" style="background:var(--navy);">
+  <div class="section-eyebrow">Planning</div>
+  <h2 class="section-h2" data-aos="fade-up">Best Time to <span style="color:var(--orange)">Visit</span></h2>
+  <p class="section-sub" data-aos="fade-up" data-aos-delay="80">Timing is everything in expedition travel. Our guides have mapped the optimal weather windows for every destination.</p>
+  <div class="climate-grid">
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="50"><div class="cl-region">Asia</div><div class="cl-dest">Himalayas, Nepal</div><div class="cl-months">🟢 Oct–May</div><div class="cl-note">Post-monsoon crystal skies. Pre-monsoon spring rhododendrons.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="110"><div class="cl-region">S. America</div><div class="cl-dest">Patagonia, Chile</div><div class="cl-months">🟢 Nov–Mar</div><div class="cl-note">Southern hemisphere summer. Long daylight hours for trekking.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="170"><div class="cl-region">Africa</div><div class="cl-dest">Serengeti, Tanzania</div><div class="cl-months">🟢 Jul–Oct</div><div class="cl-note">Peak migration season. Dry season for optimum visibility.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="230"><div class="cl-region">Europe</div><div class="cl-dest">Iceland</div><div class="cl-months">🟢 Oct–Mar</div><div class="cl-note">Northern lights season. Snow-covered glaciers. Longest nights.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="290"><div class="cl-region">Oceania</div><div class="cl-dest">New Zealand</div><div class="cl-months">🟢 Nov–Apr</div><div class="cl-note">Southern summer. All Great Walks fully open and staffed.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="350"><div class="cl-region">Africa</div><div class="cl-dest">Kilimanjaro</div><div class="cl-months">🟢 Jan–Mar, Jun–Oct</div><div class="cl-note">Avoid April–May rains. January offers clearest summit views.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="410"><div class="cl-region">Asia</div><div class="cl-dest">Borneo</div><div class="cl-months">🟢 Mar–Oct</div><div class="cl-note">Dry season. Best for orangutan spotting and jungle trekking.</div></div>
+    <div class="cl-card" data-aos="fade-up" data-aos-delay="470"><div class="cl-region">S. America</div><div class="cl-dest">Amazon Basin</div><div class="cl-months">🟢 May–Sep</div><div class="cl-note">Low-water season. Best river access and wildlife concentration.</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div><span class="footer-brand-name">
+      <img src="./assets/stackly adventure tourism logo.webp" alt="Stackly logo" class="footer-logo-img">
+      <span class="footer-brand-text">STACKLY</span>
+    </span><p class="footer-tagline">
+      Premium adventure expeditions to Earth's most formidable landscapes. Crafted by experts. Led by passion.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="./404.html" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+        <a class="social-btn" href="./404.html" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5"/>
+            <circle cx="12" cy="12" r="4.2"/>
+            <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a class="social-btn" href="./404.html" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.39.58A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.39-.58a3 3 0 0 0 2.11-2.12A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6z"/>
+          </svg>
+        </a>
+        <a class="social-btn" href="./404.html" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Quick Links</h4><ul class="footer-links">
+      <li><a href="index.html">→ Home</a></li>
+      <li><a href="about.html">→ About</a></li>
+      <li><a href="services.html">→ Services</a></li>
+      <li><a href="destinations.html">→ Destinations</a></li>
+      <li><a href="blog.html">→ Blog</a></li>
+      <li><a href="contact.html">→ Contact</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Expeditions</h4><ul class="footer-links">
+      <li><a href="./404.html">→ Trekking</a></li>
+      <li><a href="./404.html">→ Mountaineering</a></li>
+      <li><a href="./404.html">→ Wildlife Safaris</a></li>
+      <li><a href="./404.html">→ Water Adventures</a></li>
+      <li><a href="./404.html">→ Private Expeditions</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Company</h4><ul class="footer-links">
+      <li><a href="./404.html">→ Our Story</a></li>
+      <li><a href="./404.html">→ Guide Team</a></li>
+      <li><a href="./404.html">→ Conservation</a></li>
+      <li><a href="./404.html">→ Careers</a></li>
+      <li><a href="./404.html">→ Login</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Field Dispatches</h4><p class="nl-desc">Expedition reports, route previews, early access to new tours.</p><div class="nl-form"><input class="nl-input" type="email" id="nl-email" placeholder="your@email.com"><button class="nl-btn" onclick="subNewsletter()">→</button></div><div class="nl-msg" id="nl-msg"></div></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Stackly Expeditions. All rights reserved.</span><div class="footer-bottom-links"><a href="./404.html">Privacy</a><a href="./404.html">Terms</a><a href="./404.html">Cookies</a></div></div>
+</footer>
+<button id="scroll-top" onclick="goTop()">↑</button>
+<!-- <button id="float-btn" onclick="window.location.href='contact.html'">⛺ Book Now</button> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="shared.js"></script>
+<script>
+AOS.init({duration:700,easing:'ease-out-cubic',once:true,offset:60});
+document.querySelectorAll('.ml-item').forEach(i=>{i.addEventListener('click',()=>{document.querySelectorAll('.ml-item').forEach(x=>x.classList.remove('active'));i.classList.add('active');});});
+document.querySelectorAll('.dest-fav').forEach(b=>{b.addEventListener('click',e=>{e.stopPropagation();b.textContent=b.textContent==='🤍'?'❤️':'🤍';});});
+let activeChip='all',activeRegion='all';
+function filterDests(){
+  const q=document.getElementById('destSearch').value.toLowerCase();
+  const region=document.getElementById('regionSel').value;
+  activeRegion=region;
+  let any=false;
+  document.querySelectorAll('.dest-card').forEach(card=>{
+    const name=card.dataset.name||'';
+    const type=card.dataset.type||'';
+    const reg=card.dataset.region||'';
+    const matchQ=!q||name.includes(q)||type.includes(q);
+    const matchR=activeRegion==='all'||reg===activeRegion;
+    const matchC=activeChip==='all'||type.includes(activeChip);
+    const show=matchQ&&matchR&&matchC;
+    card.style.display=show?'':'none';
+    if(show)any=true;
+  });
+  document.getElementById('noResults').style.display=any?'none':'block';
+}
+function chipFilter(type,btn){
+  activeChip=type;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  filterDests();
+}
+</script>
+</body>
+</html>
